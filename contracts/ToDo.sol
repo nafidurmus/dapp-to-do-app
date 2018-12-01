@@ -11,13 +11,35 @@ contract ToDo {
     bool done;
   }
 
-  Task[] tasks;
+  //Task[] tasks; daha az gas için aşağıdakini kullandık
+  uint lastTaskId;
+  uint[] taskIds; //dinamik array
+  mapping (uint => Task) tasks;
+
+  event TaskCreated(uint, uint, string, string , bool);
+  
+
+  function ToDo () public {
+  	lastTaskId = 0;
+  }
+  
+  
 
   function createTask(string _content, string _author) public {
-    tasks.push(Task(tasks.length, now, _content, _author, false));
+  	lastTaskId++;
+    tasks[lastTaskId] = Task(lastTaskId, now, _content, _author, false);
+    taskIds.push(lastTaskId);
+    TaskCreated(lastTaskId, now, _content, _author, false),
+    
   }
 
-  function getTask(uint id) public constant 
+  function getTaskIds () public constant returns(uint[]) {
+  	return taskIds;
+  	
+  }
+  
+
+  function getTask(uint id) tasksExists(id) public constant 
     returns(
       uint,
       uint,
@@ -34,8 +56,12 @@ contract ToDo {
       );
     }
 
-    //will not work because cant return array of struct yet in Solidity
-    //function getTasks() public constant returns(Task[]) {
-    //  return tasks;
-    //}
+
+    modifier tasksExists(uint id) { 
+    	if(tasks[id].id == 0){
+    		revert();
+    	} 
+    	_;
+    }
+    
 }
