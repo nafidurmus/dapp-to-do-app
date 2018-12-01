@@ -1,6 +1,4 @@
 pragma solidity ^0.4.22;
-//pragma experimental ABIEncoderV2; // ParsedContract.sol:36:2: ParserError: Expected pragma, import directive or contract/interface/library definition.
-
 
 contract ToDo {
   struct Task {
@@ -11,35 +9,28 @@ contract ToDo {
     bool done;
   }
 
-  //Task[] tasks; daha az gas için aşağıdakini kullandık
   uint lastTaskId;
-  uint[] taskIds; //dinamik array
-  mapping (uint => Task) tasks;
+  uint[] taskIds;
+  mapping(uint => Task) tasks;
 
-  event TaskCreated(uint, uint, string, string , bool);
-  
+  event TaskCreated(uint, uint, string, string, bool);
 
-  function ToDo () public {
-  	lastTaskId = 0;
+  constructor() public {
+    lastTaskId = 0;
   }
-  
-  
 
   function createTask(string _content, string _author) public {
-  	lastTaskId++;
+    lastTaskId++;
     tasks[lastTaskId] = Task(lastTaskId, now, _content, _author, false);
     taskIds.push(lastTaskId);
-    TaskCreated(lastTaskId, now, _content, _author, false),
-    
+    emit TaskCreated(lastTaskId, now, _content, _author, false);
   }
 
-  function getTaskIds () public constant returns(uint[]) {
-  	return taskIds;
-  	
+  function getTaskIds() public constant returns(uint[]) {
+    return taskIds;
   }
-  
 
-  function getTask(uint id) tasksExists(id) public constant 
+  function getTask(uint id) taskExists(id) public constant 
     returns(
       uint,
       uint,
@@ -47,6 +38,7 @@ contract ToDo {
       string,
       bool
     ) {
+
       return(
         id,
         tasks[id].date,
@@ -56,12 +48,10 @@ contract ToDo {
       );
     }
 
-
-    modifier tasksExists(uint id) { 
-    	if(tasks[id].id == 0){
-    		revert();
-    	} 
-    	_;
+    modifier taskExists(uint id) {
+      if(tasks[id].id == 0) {
+        revert();
+      }
+      _;
     }
-    
 }
